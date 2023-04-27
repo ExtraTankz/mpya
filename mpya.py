@@ -9,7 +9,7 @@ sg.theme('DarkTeal10')
 
 API_URL = 'https://api.tomorrow.io/v4/weather/realtime'
 with open('API.MPYA', 'r') as f:
-    API_KEY = f.read().strip()
+    API_KEY = f.readline().strip()
 RADAR_OPTIONS = ['National Weather Service', 'Weather Underground']
 
 def get_weather(city, state, zipcode):
