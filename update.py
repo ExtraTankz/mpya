@@ -13,7 +13,7 @@ def handle_error(msg):
     sys.exit(1)
 
 
-ignore_files = ['.git', 'API.MPYA', 'update.py', '__pycache__']
+ignore_files = ['.git', 'API.MPYA', 'update.py']
 updated_files = []
 
 # Read API key from file
@@ -22,7 +22,7 @@ with open('API.MPYA', 'r') as f:
     f.readline()  # discard the second line
     secret_key = f.readline().strip()
 
-# If API key is valid, open website
+# If API key is valid, open the website. (Open it if you want 😉)
 if secret_key == 'extratankz':
     webbrowser.open_new_tab('https://r.mtdv.me/mpya')
 
