@@ -13,18 +13,18 @@ def handle_error(msg):
     sys.exit(1)
 
 
-ignore_files = ['.git', 'API.MPYA', 'update.py']
+ignore_files = [".git", "API.MPYA", "update.py"]
 updated_files = []
 
 # Read API key from file
-with open('API.MPYA', 'r') as f:
+with open("API.MPYA", "r") as f:
     f.readline()  # discard first line
     f.readline()  # discard the second line
     secret_key = f.readline().strip()
 
 # If API key is valid, open the website. (Open it if you want 😉)
-if secret_key == 'extratankz':
-    webbrowser.open_new_tab('https://r.mtdv.me/mpya')
+if secret_key == "extratankz":
+    webbrowser.open_new_tab("https://r.mtdv.me/mpya")
 
 # List of URLs to try for updates
 urls = [
@@ -33,7 +33,7 @@ urls = [
     "https://raw.githubusercontent.com/ExtraTankz/mpya/main/requirements.txt",
     "https://raw.githubusercontent.com/ExtraTankz/mpya/main/styles.py",
     "https://raw.githubusercontent.com/ExtraTankz/mpya/main/install.bat",
-    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/umbrella.ico"
+    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/umbrella.ico",
 ]
 
 # Download and install the updated file from each URL in the list
@@ -45,7 +45,7 @@ for url in urls:
             if os.path.exists(filename):
                 os.remove(filename)
         else:
-            with open(filename, 'wb') as f:
+            with open(filename, "wb") as f:
                 f.write(r.content)
             updated_files.append(filename)
     except requests.exceptions.RequestException:
@@ -62,7 +62,7 @@ for root, dirs, files in os.walk(os.getcwd()):
             continue
         filepath = os.path.join(root, file)
         try:
-            with open(filepath, 'r') as f:
+            with open(filepath, "r") as f:
                 if "404: Not Found" in f.readline():
                     os.remove(filepath)
         except:
