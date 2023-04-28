@@ -99,14 +99,14 @@ def get_location():
             pad=pad)],
         [sg.HSeparator()],
         [sg.Radio(
-            "Weather Underground",
+            "Weather Underground 'Wundermap' Radar",
             "radar",
             default=True,
             key="wunderground",
             font=font,
             pad=pad)],
         [sg.Radio(
-            "National Weather Service", 
+            "National Weather Service Radar", 
             "radar", 
             key="nws", 
             font=font, 
