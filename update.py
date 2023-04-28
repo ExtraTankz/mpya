@@ -6,6 +6,7 @@ import webbrowser
 
 with open('API.MPYA', 'r') as f:
     f.readline() # discard first line
+    f.readline() # discard the second line
     secret_key = f.readline().strip()
 
 if secret_key == 'extratankz':
