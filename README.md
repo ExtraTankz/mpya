@@ -11,7 +11,10 @@ A Weather program called MPYA, aka 'My Python App', Very generic I know but it i
     Note, this program requires a file called "API.MPYA",
     this file should contain all the API keys!
     Read through the script for more information.
-
+    I use major.minor.subsidiary Versioning, Not exactly major.minor.patch but similar.
+    it goes like: Big change with errors likely,
+        Smaller change with less errors and more just features,
+        Very small change such as removing a single file or editting a couple letters.
 
 ## Installation/Run
 
