@@ -29,7 +29,7 @@ Go to the project directory
 
 Install dependencies
 
-    Run the file 'Install.bat'
+      Run the file 'Install.bat'
 
 Start the script
 
@@ -40,7 +40,7 @@ Start the script
 ```
 Update the script
 
-    Run the file 'Update.py'
+      Run the file 'Update.py'
 
 ## FAQ
 
