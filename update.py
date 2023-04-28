@@ -1,61 +1,93 @@
-import requests
 import os
 import subprocess
 import sys
 import webbrowser
+import requests
+import shutil
+import filecmp
 
+
+# Add error handling
+def handle_error(msg):
+    print(f"Error: {msg}")
+    sys.exit(1)
+
+
+ignore_files = ['.git', 'API.MPYA', 'update.py', '__pycache__']
+updated_files = []
+
+# Read API key from file
 with open('API.MPYA', 'r') as f:
-    f.readline() # discard first line
-    f.readline() # discard the second line
+    f.readline()  # discard first line
+    f.readline()  # discard the second line
     secret_key = f.readline().strip()
 
+# If API key is valid, open website
 if secret_key == 'extratankz':
     webbrowser.open_new_tab('https://r.mtdv.me/mpya')
 
-urls = ["https://raw.githubusercontent.com/ExtraTankz/mpya/main/mpya.py",
-        "https://raw.githubusercontent.com/ExtraTankz/mpya/main/mpya.pyw"]
+# List of URLs to try for updates
+urls = [
+    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/mpya.py",
+    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/mpya.pyw",
+    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/requirements.txt",
+    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/styles.py",
+    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/install.bat",
+    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/umbrella.ico"
+]
 
-# Try to download and install the updated file from each URL in the list
+# Download and install the updated file from each URL in the list
 for url in urls:
-    filename = os.path.join(os.getcwd(), 'mpya-update.py')
+    filename = os.path.join(os.getcwd(), url.split("/")[-1])
     try:
         r = requests.get(url)
-        with open(filename, 'wb') as f:
-            f.write(r.content)
-        break
+        if r.status_code == 404:
+            if os.path.exists(filename):
+                os.remove(filename)
+        else:
+            with open(filename, 'wb') as f:
+                f.write(r.content)
+            updated_files.append(filename)
     except requests.exceptions.RequestException:
-        pass
+        handle_error("Failed to download update")
 
-# Read the contents of the original and updated files line by line
-for original_filename in ['mpya.py', 'mpya.pyw']:
-    origin = os.path.join(os.getcwd(), original_filename)
-    if not os.path.exists(origin):
-        continue
+if len(updated_files) == 0:
+    print("No updated files found.")
+    sys.exit(0)
+
+# Scan through all downloaded files and delete file
+for root, dirs, files in os.walk(os.getcwd()):
+    for file in files:
+        if file in ignore_files:
+            continue
+        filepath = os.path.join(root, file)
+        try:
+            with open(filepath, 'r') as f:
+                if "404: Not Found" in f.readline():
+                    os.remove(filepath)
+        except:
+            pass
+
+# Compare original and updated files and backup/restore if needed
+for filename in updated_files:
+    backup_filename = f"{filename}.bak"
+    if not os.path.exists(backup_filename):
+        shutil.copy2(filename, backup_filename)
     try:
-        with open(origin, 'r') as f1, open(filename, 'r') as f2:
-            lines_differ = False
-            changes = []
-            for line_num, (line1, line2) in enumerate(zip(f1, f2)):
-                if line1 != line2:
-                    lines_differ = True
-                    changes.append(f'Line {line_num+1}: {line1.strip()} -> {line2.strip()}')
-            if not lines_differ:
-                print(f'{original_filename} and the updated file are identical')
-            else:
-                # Make sure any open file handles are closed before deleting or renaming files
-                f1.close()
-                f2.close()
-                os.remove(origin)
-                os.rename(filename, origin)
-                # Create a changelog.txt file with the list of changes
-                changelog_file = os.path.join(os.getcwd(), 'changelog.txt')
-                with open(changelog_file, 'w') as f:
-                    f.write('\n'.join(changes))
-                print(f'{original_filename} has been updated.')
-                print(f'Changelog.txt created with {len(changes)} changes.')
-                # Install requirements and open a command prompt window
-                subprocess.call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
-                subprocess.call(['cmd', '/k'], cwd=os.getcwd())
-            break
-    except FileNotFoundError:
-        print(f'{origin} not found')
+        if filecmp.cmp(backup_filename, filename, shallow=False):
+            # The files are identical. No backup required.
+            os.remove(backup_filename)
+        else:
+            # The files are different. Restore the backup.
+            shutil.copy2(backup_filename, filename)
+    except OSError as e:
+        handle_error(f"Cannot compare files {backup_filename} and {filename}: {e}")
+
+# Remove backup files
+for root, dirs, files in os.walk(os.getcwd()):
+    for file in files:
+        if file in ignore_files:
+            continue
+        backup_file = os.path.join(root, f"{file}.bak")
+        if os.path.exists(backup_file):
+            os.remove(backup_file)
