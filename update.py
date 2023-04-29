@@ -21,7 +21,7 @@ with open("API.MPYA", "r") as f:
 # If API key is valid, open the website (commented out since it may interfere with script execution)
 if secret_key == "extratankz":
     pass
-    # webbrowser.open_new_tab("https://r.mtdv.me/mpya")
+    webbrowser.open_new_tab("https://r.mtdv.me/mpya")
 
 # List of URLs to try for updates
 urls = [
@@ -30,7 +30,6 @@ urls = [
     "https://raw.githubusercontent.com/ExtraTankz/mpya/main/requirements.txt",
     "https://raw.githubusercontent.com/ExtraTankz/mpya/main/styles.py",
     "https://raw.githubusercontent.com/ExtraTankz/mpya/main/install.bat",
-    "https://raw.githubusercontent.com/ExtraTankz/mpya/main/umbrella.ico",
 ]
 
 # Download the updated version of update.py from your repository
@@ -43,14 +42,14 @@ try:
         f.write(r.content)
 except requests.exceptions.RequestException:
     handle_error("Failed to download update")
-
+"""
 # Modify the contents of update_new.py to include the new code
 with open(update_file, "r") as f:
     content = f.read()
     content = content.replace("urls =[", f"urls = {urls}\n\n")
     with open(update_file, "w") as wf:
         wf.write(content)
-
+"""
 # Download and update contents of other files
 for url in urls:
     file_name = url.split("/")[-1]
