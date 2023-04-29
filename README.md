@@ -56,3 +56,21 @@ Update the script
 #### Its slow! / This sucks!
 
 Its my 1st python script chill out! Its heavily unoptimized, slow, unnecessarily long too.
+
+## Authors
+
+- [@ExtraTankz](https://github.com/ExtraTankz) Creator and Founder of ExtraTankz Studios
+
+- [@DevJ Lab](https://github.com/DevJ-Lab) Developer for ExtraTankz Studios & DevJ Coding.
+## Contributing
+
+- [@DevJ Lab](https://github.com/DevJ-Lab) Worked on update.py alongside [@ExtraTankz](https://github.com/ExtraTankz)
+
+Contributions are always welcome!
+
+Submit a pull request or an Issue to get your feature added
+
+and your name listed
+## License
+
+[Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
