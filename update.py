@@ -4,17 +4,13 @@ import sys
 import webbrowser
 import requests
 import shutil
-import filecmp
 
 
 # Add error handling
 def handle_error(msg):
     print(f"Error: {msg}")
-    sys.exit(1)
-
-
-ignore_files = [".git", "API.MPYA", "update.py"]
-updated_files = []
+    if "Failed to download file" not in msg:
+        sys.exit(1)
 
 # Read API key from file
 with open("API.MPYA", "r") as f:
@@ -22,9 +18,10 @@ with open("API.MPYA", "r") as f:
     f.readline()  # discard the second line
     secret_key = f.readline().strip()
 
-# If API key is valid, open the website. (Open it if you want 😉)
+# If API key is valid, open the website (commented out since it may interfere with script execution)
 if secret_key == "extratankz":
-    webbrowser.open_new_tab("https://r.mtdv.me/mpya")
+    pass
+    # webbrowser.open_new_tab("https://r.mtdv.me/mpya")
 
 # List of URLs to try for updates
 urls = [
@@ -36,58 +33,53 @@ urls = [
     "https://raw.githubusercontent.com/ExtraTankz/mpya/main/umbrella.ico",
 ]
 
-# Download and install the updated file from each URL in the list
+# Download the updated version of update.py from your repository
+update_url = "https://raw.githubusercontent.com/ExtraTankz/mpya/main/update.py"  # change to your repo URL
+update_file = "update_new.py"
+try:
+    r = requests.get(update_url)
+    r.raise_for_status()
+    with open(update_file, "wb") as f:
+        f.write(r.content)
+except requests.exceptions.RequestException:
+    handle_error("Failed to download update")
+
+# Modify the contents of update_new.py to include the new code
+with open(update_file, "r") as f:
+    content = f.read()
+    content = content.replace("urls =[", f"urls = {urls}\n\n")
+    with open(update_file, "w") as wf:
+        wf.write(content)
+
+# Download and update contents of other files
 for url in urls:
-    filename = os.path.join(os.getcwd(), url.split("/")[-1])
+    file_name = url.split("/")[-1]
     try:
         r = requests.get(url)
-        if r.status_code == 404:
-            if os.path.exists(filename):
-                os.remove(filename)
-        else:
-            with open(filename, "wb") as f:
-                f.write(r.content)
-            updated_files.append(filename)
+        r.raise_for_status()
+        with open(file_name, "w", encoding="utf-8") as f:
+            f.write(r.text)
     except requests.exceptions.RequestException:
-        handle_error("Failed to download update")
+        handle_error(f"Failed to download file: {file_name}")
 
-if len(updated_files) == 0:
-    print("No updated files found.")
-    sys.exit(0)
+# Run the new version of the script
+subprocess.Popen(["python", update_file], close_fds=True)
 
-# Scan through all downloaded files and delete file
-for root, dirs, files in os.walk(os.getcwd()):
-    for file in files:
-        if file in ignore_files:
-            continue
-        filepath = os.path.join(root, file)
+# Rename the old update.py file to update_old.py
+old_file = "update.py"
+if os.path.exists(old_file):
+    old_backup = "update_old.py"
+    if os.path.exists(old_backup):
+        os.remove(old_backup)
+    os.rename(old_file, old_backup)
+
+# Rename the new update_new.py file to update.py once the script has finished executing
+if os.path.exists(update_file):
+    while True:
         try:
-            with open(filepath, "r") as f:
-                if "404: Not Found" in f.readline():
-                    os.remove(filepath)
-        except:
+            os.rename(update_file, old_file)
+            break
+        except OSError:
             pass
-
-# Compare original and updated files and backup/restore if needed
-for filename in updated_files:
-    backup_filename = f"{filename}.bak"
-    if not os.path.exists(backup_filename):
-        shutil.copy2(filename, backup_filename)
-    try:
-        if filecmp.cmp(backup_filename, filename, shallow=False):
-            # The files are identical. No backup required.
-            os.remove(backup_filename)
-        else:
-            # The files are different. Restore the backup.
-            shutil.copy2(backup_filename, filename)
-    except OSError as e:
-        handle_error(f"Cannot compare files {backup_filename} and {filename}: {e}")
-
-# Remove backup files
-for root, dirs, files in os.walk(os.getcwd()):
-    for file in files:
-        if file in ignore_files:
-            continue
-        backup_file = os.path.join(root, f"{file}.bak")
-        if os.path.exists(backup_file):
-            os.remove(backup_file)
+else:
+    handle_error("Update failed")
