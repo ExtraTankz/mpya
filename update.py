@@ -42,14 +42,7 @@ try:
         f.write(r.content)
 except requests.exceptions.RequestException:
     handle_error("Failed to download update")
-"""
-# Modify the contents of update_new.py to include the new code
-with open(update_file, "r") as f:
-    content = f.read()
-    content = content.replace("urls =[", f"urls = {urls}\n\n")
-    with open(update_file, "w") as wf:
-        wf.write(content)
-"""
+
 # Download and update contents of other files
 for url in urls:
     file_name = url.split("/")[-1]
